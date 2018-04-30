@@ -17,10 +17,18 @@
  * @date 2018, April
  */
 
+#include <sstream>
 #include <stdio.h>
 
-void graph_n_m_star (FILE *fd, int n, int m)
+#include "graph-generator.h"
+
+using namespace std;
+
+void graph_n_m_star (int n, int m)
 {
+	ostringstream filename;
+	filename << "graph_n-m-star_" << n << "-" << m;
+	FILE *fd = fopen (filename.str ().c_str (), "w");
 	int V = n + m + 2;
 	int E = n + m + 1;
 	fprintf (fd, "%d\n%d\n", V, E);
@@ -29,4 +37,5 @@ void graph_n_m_star (FILE *fd, int n, int m)
 	fprintf (fd, "%d %d\n", V, V - 1);
 	for (int i = 0; i < m; i++)
 		fprintf (fd, "%d %d\n", i + 1 + n, V);
+	fclose (fd);
 }
