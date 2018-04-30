@@ -18,3 +18,19 @@ Graph::Graph (const string &filename):
 	}
 	fclose (fd);
 }
+
+void Graph::export_graphviz (const string &filename) const
+{
+	FILE *fd = fopen (filename.c_str (), "w");
+	fprintf (fd, "strict graph _ {\n");
+	for (unsigned int v = 0; v < this->V; v++) {
+		fprintf (fd, "%d\n", v);
+		for (int ein2 : this->nodes [v].edges) {
+			if (v < ein2) {
+				fprintf (fd, "%d -- %d;\n", v, ein2);
+			}
+		}
+	}
+	fprintf (fd, "}\n");
+	fclose (fd);
+}
