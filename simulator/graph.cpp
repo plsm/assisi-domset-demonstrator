@@ -57,3 +57,25 @@ bool Graph::is_domset () const
 	}
 	return true;
 }
+
+bool Graph::is_independent_domset () const
+{
+	vector<bool> marked (this->V);
+	for (unsigned int v = 0; v < this->V; v++) {
+		if (this->nodes [v].mark) {
+			marked [v] = true;
+			for (int ein2 : this->nodes [v].edges) {
+				if (this->nodes [ein2].mark) {
+					return false;
+				}
+				marked [ein2] = true;
+			}
+		}
+	}
+	for (bool v : marked) {
+		if (!v) {
+			return false;
+		}
+	}
+	return true;
+}
