@@ -25,10 +25,20 @@ class Graph
 	Solution min_domset;
 	Solution min_ind_domset;
 	void add_edge (unsigned int n1, unsigned int n2);
+	void export_solution_graphviz (const std::set<int unsigned> &solution, const std::string &filename) const;
 public:
 	Graph (unsigned int V);
 	Graph (const std::string &filename);
 	void export_graphviz (const std::string &filename) const;
+	/**
+	 * @brief export_solution_graphviz Create a graphviz file with one of the
+	 * solutions of the minimum independent dominating set problem.
+	 *
+	 * @param index
+	 * @param filename
+	 */
+	void export_min_domset_solution_graphviz (unsigned int index, const std::string &filename) const;
+	void export_min_ind_domset_solution_graphviz (unsigned int index, const std::string &filename) const;
 	/**
 	 * @brief is_min_domset Checks if the marked nodes constitute a dominating set
 	 * of this graph.

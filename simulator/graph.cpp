@@ -45,15 +45,15 @@ Graph Graph::generate_n_m_star (unsigned int n, unsigned int m)
 	result.add_edge (n, m + n + 1);
 	result.min_domset.size = 1;
 	unsigned int v[] = {n, m + n + 1};
-	set<unsigned int> sol (v, v + 1);
+	set<unsigned int> sol (v, v + 2);
 	result.min_domset.sets.push_back (sol);
 	if (n == m) {
 		result.min_ind_domset.size = 2;
 		for (unsigned int c = 0; c < 2; c++) {
 			set<unsigned int> sol;
-			sol.push_back (c * (m + 1) + n);
+			sol.insert (c * (m + 1) + n);
 			for (unsigned int v = 0; v < n; v++) {
-				sol.push_back (v + (1 - c) * (n + 1));
+				sol.insert (v + (1 - c) * (n + 1));
 			}
 			result.min_ind_domset.sets.push_back (sol);
 		}
@@ -62,15 +62,15 @@ Graph Graph::generate_n_m_star (unsigned int n, unsigned int m)
 		result.min_ind_domset.size = 1;
 		set<unsigned int> sol;
 		if (n < m) {
-			sol.push_back (m + n + 1);
+			sol.insert (m + n + 1);
 			for (unsigned int v = 0; v < n; v++) {
-				sol.push_back (v);
+				sol.insert (v);
 			}
 		}
 		else {
-			sol.push_back (n);
+			sol.insert (n);
 			for (unsigned int v = 0; v < m; v++) {
-				sol.push_back (v + n + 1);
+				sol.insert (v + n + 1);
 			}
 		}
 		result.min_ind_domset.sets.push_back (sol);
@@ -96,6 +96,36 @@ void Graph::export_graphviz (const string &filename) const
 	}
 	fprintf (fd, "}\n");
 	fclose (fd);
+}
+
+void Graph::export_solution_graphviz (const std::set<unsigned int> &solution, const std::string &filename) const
+{
+	FILE *fd = fopen (filename.c_str (), "w");
+	fprintf (fd, "strict graph _ {\n");
+	for (unsigned int v = 0; v < this->V; v++) {
+		fprintf (fd, "%d", v);
+		if (solution.count (v) == 1) {
+			fprintf (fd, " [style=bold]");
+		}
+		fprintf (fd, ";\n");
+		for (unsigned int ein2 : this->nodes [v].edges) {
+			if (v < ein2) {
+				fprintf (fd, "%d--%d;\n", v, ein2);
+			}
+		}
+	}
+	fprintf (fd, "}\n");
+	fclose (fd);
+}
+
+void Graph::export_min_domset_solution_graphviz (unsigned int index, const std::string &filename) const
+{
+	this->export_solution_graphviz (this->min_domset.sets [index], filename);
+}
+
+void Graph::export_min_ind_domset_solution_graphviz (unsigned int index, const std::string &filename) const
+{
+	this->export_solution_graphviz (this->min_ind_domset.sets [index], filename);
 }
 
 bool Graph::is_domset () const
