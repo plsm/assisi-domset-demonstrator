@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 struct Node
 {
@@ -10,12 +11,22 @@ struct Node
 	bool mark;
 };
 
+struct Solution
+{
+	unsigned int size;
+	std::vector<std::set<unsigned int> > sets;
+};
+
 class Graph
 {
 	unsigned int V;
 	unsigned int E;
 	std::vector<Node> nodes;
+	Solution min_domset;
+	Solution min_ind_domset;
+	void add_edge (unsigned int n1, unsigned int n2);
 public:
+	Graph (unsigned int V);
 	Graph (const std::string &filename);
 	void export_graphviz (const std::string &filename) const;
 	/**
@@ -37,6 +48,7 @@ public:
 	 * of this graph.
 	 */
 	bool is_independent_domset () const;
+	static Graph generate_n_m_star (unsigned int n, unsigned int m);
 };
 
 #endif // GRAPH_HPP
