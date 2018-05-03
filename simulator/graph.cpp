@@ -31,6 +31,7 @@ void Graph::add_edge (unsigned int n1, unsigned int n2)
 	this->E++;
 	this->nodes [n1].edges.push_back (n2);
 	this->nodes [n2].edges.push_back (n1);
+	this->edges.push_back (Edge {.n1 = n1, .n2 = n2});
 }
 
 Graph Graph::generate_n_m_star (unsigned int n, unsigned int m)
@@ -88,7 +89,7 @@ void Graph::export_graphviz (const string &filename) const
 			fprintf (fd, " [style=bold]");
 		}
 		fprintf (fd, ";\n");
-		for (int ein2 : this->nodes [v].edges) {
+		for (unsigned int ein2 : this->nodes [v].edges) {
 			if (v < ein2) {
 				fprintf (fd, "%d--%d;\n", v, ein2);
 			}
@@ -98,7 +99,7 @@ void Graph::export_graphviz (const string &filename) const
 	fclose (fd);
 }
 
-void Graph::export_solution_graphviz (const std::set<unsigned int> &solution, const std::string &filename) const
+void Graph::export_solution_graphviz (const set<unsigned int> &solution, const std::string &filename) const
 {
 	FILE *fd = fopen (filename.c_str (), "w");
 	fprintf (fd, "strict graph _ {\n");

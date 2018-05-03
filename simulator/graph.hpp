@@ -7,8 +7,13 @@
 
 struct Node
 {
-	std::vector<int> edges;
+	std::vector<unsigned int> edges;
 	bool mark;
+};
+
+struct Edge
+{
+	unsigned int n1, n2;
 };
 
 struct Solution
@@ -22,6 +27,7 @@ class Graph
 	unsigned int V;
 	unsigned int E;
 	std::vector<Node> nodes;
+	std::vector<Edge> edges;
 	Solution min_domset;
 	Solution min_ind_domset;
 	void add_edge (unsigned int n1, unsigned int n2);
