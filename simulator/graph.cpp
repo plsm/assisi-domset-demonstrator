@@ -169,3 +169,19 @@ bool Graph::is_independent_domset () const
 	}
 	return true;
 }
+
+void Graph::compute_domset_RSEIDE (gsl_rng *prng, float probability_select_edge)
+{
+	set<Edge> edges (this->edges.begin (), this->edges.end ());
+	while (edges.size () > 0) {
+		Edge e = *(edges.begin ());
+		edges.erase (edges.begin ());
+		if (gsl_rng_uniform (prng) < probability_select_edge) {
+			unsigned d1 = (gsl_rng_uniform (prng) < 0.5 ? e.n1 : e.n2);
+			this->nodes [d1].mark = true;
+			for (unsigned int d2 : this->nodes [d1].edges) {
+				edges.erase (Edge (d1, d2));
+			}
+		}
+	}
+}

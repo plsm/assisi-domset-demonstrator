@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <gsl/gsl_rng.h>
 
 struct Node
 {
@@ -14,6 +15,14 @@ struct Node
 struct Edge
 {
 	unsigned int n1, n2;
+	Edge (unsigned int n1, unsigned int n2):
+	   n1 (std::min (n1, n2)),
+	   n2 (std::max (n1, n2))
+	{}
+	bool operator< (const Edge e) const
+	{
+		return this->n1 < e.n1 || (this->n1 == e.n1 && this->n2 < e.n2);
+	}
 };
 
 struct Solution
@@ -65,6 +74,20 @@ public:
 	 */
 	bool is_independent_domset () const;
 	static Graph generate_n_m_star (unsigned int n, unsigned int m);
+	/**
+	 * @brief compute_domset_RSEIDE Randomly select an edge, pick one of its nodes
+	 * and inhibit the departing edges.
+	 *
+	 * This algorithm goes through all edges. An edge can be processed depending on
+	 * probability <i>p</i>.
+	 *
+	 * Processing an edge means: select one of its nodes; inhibit the departing
+	 * edges from being processed.
+	 *
+	 * @param prng
+	 * @param probability_select_edge
+	 */
+	void compute_domset_RSEIDE (gsl_rng *prng, float probability_select_edge);
 };
 
 #endif // GRAPH_HPP
