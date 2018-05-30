@@ -1,6 +1,7 @@
 import argparse
 import csv
 import os.path
+import stat
 import yaml
 
 import assisipy.casu
@@ -21,7 +22,6 @@ class CASU_log:
                     self.ir_raw.append ([convert(x) for x in row [1:]])
                 elif row [0] == 'temp':
                     self.temp.append ([convert(x) for x in row [1:]])
-            ## self.data = [[row[0]] + [convert(x) for x in row [1:]] for row in reader]
             fd.close ()
 
     def highest_smallest_time (self):
@@ -29,14 +29,14 @@ class CASU_log:
 
     def temperature (self, time):
         index = CASU_log.__binary_search_time (self.temp, time)
-        if index == len (self.temp):
+        if index == len (self.temp) or index + 1 == len (self.temp):
             return None
         else:
             return self.temp [index][assisipy.casu.TEMP_WAX - assisipy.casu.TEMP_F + 1]
 
     def infrared (self, time):
         index = CASU_log.__binary_search_time (self.ir_raw, time)
-        if index == len (self.ir_raw):
+        if index == len (self.ir_raw) or index + 1 == len (self.ir_raw):
             return None
         else:
             return sum (self.ir_raw [index][1:7]) / 6.0
@@ -59,7 +59,7 @@ class Node:
     def __init__ (self, list_casu_numbers, dict_CASU_logs):
         self.CASU_logs = dict ([(c, dict_CASU_logs [c]) for c in list_casu_numbers])
         self.number_CASUs = float (len (list_casu_numbers))
-        print (self.CASU_logs)
+        #print (self.CASU_logs)
 
     def highest_smallest_time (self):
         return max ([c.highest_smallest_time () for c in self.CASU_logs.values ()])
@@ -81,14 +81,11 @@ class Node:
 
 class Edge:
     def __init__ (self, nodes, dict_nodes):
-        print (nodes)
         self.nodes = (dict_nodes [nodes [0]], dict_nodes [nodes [1]])
-        print (self.nodes)
 
-    def build_data_set (self, sampling_time, delta_time, temperature_threshold):
+    def build_data_set (self, writer, sampling_time, delta_time, temperature_threshold):
         print ('Computing data set for edge {} {}'.format (self.nodes [0], self.nodes [1]))
         current_time = max (self.nodes [0].highest_smallest_time (), self.nodes [1].highest_smallest_time ())
-        result = []
         print ('Computing build data starting from time {}'.format (current_time))
         go = True
         while go:
@@ -106,12 +103,11 @@ class Edge:
                 if t1 is None or t2 is None:
                     go = False
                 else:
-                    record_class = [t1 > temperature_threshold and t2 > temperature_threshold]
-                    record = record_class + record_attributes
-                    result.append (record)
+                    record_class = ['KO' if t1 > temperature_threshold and t2 > temperature_threshold else 'OK']
+                    record = [current_time] + record_class + record_attributes
+                    writer.writerow (record)
                     current_time += sampling_time
-
-        return result
+        return None
 
 def process_arguments ():
     parser = argparse.ArgumentParser (
@@ -122,7 +118,13 @@ def process_arguments ():
         '--base-path',
         type = str,
         default = '.',
-        help = 'path to append to file names'
+        help = 'path to append to CASU log file names'
+    )
+    parser.add_argument (
+        '--condition',
+        type = str,
+        default = '',
+        help = 'string to add to the repeat description'
     )
     parser.add_argument (
         '--graph', '-g',
@@ -154,17 +156,24 @@ def main ():
     with open (args.graph, 'r') as fd:
         graph = yaml.load (fd)
     CASUs = [c for n in graph ['CASU_nodes'] for c in graph ['CASU_nodes'][n] ]
+    print ('Reading CASU logs in folder {}'.format (args.base_path))
     CASU_logs = dict ([(c, CASU_log (c, args.base_path)) for c in CASUs])
     nodes = dict ([(n, Node (graph ['CASU_nodes'] [n], CASU_logs)) for n in graph ['CASU_nodes']])
     edges = [Edge (ns, nodes) for ns in graph ['edges']]
-
-    dataset = []
-    for e in edges:
-        dataset.extend (e.build_data_set (args.sampling_time, args.delta_time, args.temperature_threshold))
-    print (dataset)
-    with open ('data-set_st={}_dt={}_tt={}'.format (args.sampling_time, args.delta_time, args.temperature_threshold), 'w') as fd:
+    data_set_filename = 'data-set_st={}_dt={}_tt={}_graph={}_repeat={}{}.csv'.format (
+        args.sampling_time,
+        args.delta_time,
+        args.temperature_threshold,
+        os.path.basename (args.graph),
+        args.condition,
+        os.path.basename (args.base_path).replace ('/', '_')
+    )
+    with open (data_set_filename, 'w') as fd:
         writer = csv.writer (fd, delimiter = ',', quoting = csv.QUOTE_NONNUMERIC, quotechar = '"')
-        writer.writerows (dataset)
-
+        writer.writerow (['time', 'class', 'temperature.1', 'temperature.2', 'infrared.1', 'infrared.2'])
+        for e in edges:
+            e.build_data_set (writer, args.sampling_time, args.delta_time, args.temperature_threshold)
+        fd.close ()
+    os.chmod (data_set_filename, stat.S_IRUSR)
 
 main ()
