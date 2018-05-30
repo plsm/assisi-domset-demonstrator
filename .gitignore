@@ -1,3 +1,6 @@
+# QT build stuff
+build-simulator-Desktop-Debug/*
+
 # Prerequisites
 *.d
 
