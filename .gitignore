@@ -1,3 +1,9 @@
+# Emacs droppings
+*~
+
+# Pycharm configurations
+.idea
+
 # QT build stuff
 build-simulator-Desktop-Debug/*
 
