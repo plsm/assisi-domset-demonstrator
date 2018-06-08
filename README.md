@@ -20,12 +20,12 @@ To build the trees.
 
 Graph file contents
 
-  number_nodes: 5
-  edges: [ [1, 2], [2, 3], [2, 5], [5, 4], [1, 4]]
-  CASU_nodes: {
-  1:[20,21],
-  2:[22,23,24],
-  3:[25],
-  4:[29,30],
-  5:[31,32]
-  }
+    number_nodes: 5
+    edges: [ [N1, N2], [N2, N3], [N2, N5], [N5, N4], [N1, N4]]
+    CASU_nodes: {
+      N1:[20,21],
+      N2:[22,23,24],
+      N3:[25],
+      N4:[29,30],
+      N5:[31,32]
+    }
