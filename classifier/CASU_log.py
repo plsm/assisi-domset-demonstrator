@@ -29,7 +29,7 @@ class CASU_log:
         self.ir_raw = []
         self.temp = []
         self.led = []
-        with open (os.path.join (base_path, 'casu-{:03d}.csv'.format (number)), 'r') as fd:
+        with open (os.path.join (base_path, filename (number)), 'r') as fd:
             reader = csv.reader (fd, delimiter=';', quoting = csv.QUOTE_MINIMAL)
             for row in reader:
                 if row [0] == 'ir_raw':
@@ -70,3 +70,6 @@ class CASU_log:
             else:
                 high = middle
         return low
+
+def filename (number):
+    return 'casu-{:03d}.csv'.format (number)
