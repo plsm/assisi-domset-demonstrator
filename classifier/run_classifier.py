@@ -15,9 +15,10 @@ import dataset
 
 def main ():
     args = parse_arguments ()
-    RNG = numpy.random.RandomState (int (time.time ()) if args.RNG_seed is None else args.RNG_seed)
+    seed = int (time.time ()) if args.RNG_seed is None else args.RNG_seed
+    RNG = numpy.random.RandomState (seed)
     data_sets = dataset.load_data_sets (args.data_sets)
-    suffix = filename_suffix (args)
+    suffix = filename_suffix (args, seed)
 
     parameters = load_decision_tree_parameters (args.learning_parameters)
     results_file, results_writer = open_decision_tree_results (suffix)
@@ -138,14 +139,14 @@ def random_chance_to_hit (train, test):
     result = result / float (len (train.IDs) * len (test.IDs))
     return result
 
-def filename_suffix (args):
+def filename_suffix (args, seed):
     # type: (argparse.Namespace) -> str
     data = datetime.datetime.now ().__str__().split ('.') [0]
     data = data.replace (' ', '-').replace (':', '-')
     result = "{0}_{1}_{2}_{3}_{4}".format (
         os.path.basename (args.data_sets),
         os.path.basename (args.learning_parameters),
-        args.RNG_seed,
+        seed,
         args.fraction_test,
         data
     )
