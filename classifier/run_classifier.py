@@ -30,7 +30,7 @@ def main ():
 
 def parse_arguments ():
     parser = argparse.ArgumentParser (
-        description = "Optigrape worker"
+        description = "Process data-sets containing from CASU logs generated during a control DOMSET experiment.  Produces a set of decision trees that classify edges according to whether they become problematic or not."
     )
     parser.add_argument (
         "--data-sets",
