@@ -4,6 +4,22 @@ import os.path
 import assisipy.casu
 
 class CASU_log:
+    """
+    List of CASU log data that is not parsed in the current version of this class:
+
+    Airflow
+    DiagnosticLed
+    dled_ref
+    fft_amp
+    fft_freq
+    ir_range
+    ir_raw
+    Peltier
+    Peltier_temp
+    Speaker
+    temp
+    VibrationPattern
+    """
     def __init__ (self, number, base_path = '.'):
         def convert (a):
             if a.find ('.') > -1:
@@ -54,4 +70,3 @@ class CASU_log:
             else:
                 high = middle
         return low
-
