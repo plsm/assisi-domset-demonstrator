@@ -20,7 +20,7 @@ class CASU_log:
     temp
     VibrationPattern
     """
-    def __init__ (self, number, base_path = '.'):
+    def __init__ (self, key, base_path = '.'):
         def convert (a):
             if a.find ('.') > -1:
                 return float (a)
@@ -29,7 +29,13 @@ class CASU_log:
         self.ir_raw = []
         self.temp = []
         self.led = []
-        with open (os.path.join (base_path, filename (number)), 'r') as fd:
+        if isinstance (key, int):
+            fn = filename (key)
+        elif isinstance (key, str):
+            fn = key
+        else:
+            raise AssertionError ("key argument is not an int nor a string")
+        with open (os.path.join (base_path, fn), 'r') as fd:
             reader = csv.reader (fd, delimiter=';', quoting = csv.QUOTE_MINIMAL)
             for row in reader:
                 if row [0] == 'ir_raw':
