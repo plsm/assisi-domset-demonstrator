@@ -7,6 +7,7 @@ analysis <- fread ("analysis.csv")
 read.repeat.data <- function (
   filename
 ) {
+  cat (sprintf ("Reading %s\n", filename))
   result <- fread (
       input = filename,
       col.names = c (
